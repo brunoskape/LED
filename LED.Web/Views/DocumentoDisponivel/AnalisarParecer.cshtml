@@ -1,0 +1,491 @@
+﻿@model LED.Entities.AnaliseDocumentoSEI
+
+@{
+    ViewBag.Title = "Analisar Documentos";
+    ViewBag.IconRoute = "fa fa-edit fa-fw";
+    ViewBag.DescrRoute = "Analise de Documentos / Documento Disponivel / Analisar Paracer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*@section imports {
+    @{ var version = Guid.NewGuid().ToString(); }
+    <script type="text/javascript" src="~/Scripts/consulta-orgao-logado.js?v=@version"></script>
+    <script type="text/javascript" src="~/Scripts/util.js?v=@version"></script>
+}*@
+
+<script type="text/javascript">
+
+     $(document).ready(function () {
+
+         $("#inputDataParecer").inputmask("99/99/9999");
+         $("#inputDataPublicacao").inputmask("99/99/9999");
+         $("#inputNumeroProcesso").inputmask("9999-9999999");
+         $("#inputAnoParecer").inputmask("9999");
+         $('#inputProcessoTCE').inputmask("999999-9/9999")
+
+
+        $.ajax({
+            url: '@Url.Action("CarregaComboAutoridadeProla", "DocumentoDisponivel")',
+            type: "GET",
+            dataType: 'json',
+            cache: false,
+            data: {
+                'pCarregaDecisao': false
+            },
+            success: function (obj) {
+                if (obj != null) {
+                    var data = obj.data;
+                    var selectbox = $('#dropAutoridadeProlatora');
+                    selectbox.find('option').remove();
+                    $('<option>').val("").text("Selecionar a Autoridade").appendTo(selectbox);
+                    $.each(data, function (i, d) {
+                        $('<option>').val(d.codAutoridade).text(d.responsavel).appendTo(selectbox);
+                    });
+                }
+            }
+        });
+
+         $('#inputAutoridadeTCE').prop('disabled', true);
+         $('#inputProcessoTCE').prop('disabled', true);
+         $('#inputAnoParecer').prop('disabled', true);
+         $('#inputDataParecer').prop('disabled', true);
+
+         $('#dropAutoridadeProlatora').change(function () {
+             $('#inputAutoridadeTCE').prop('disabled', ($('#dropAutoridadeProlatora').val() != 14));
+             $('#inputProcessoTCE').prop('disabled', ($('#dropAutoridadeProlatora').val() != 14));
+             $('#inputAutoridadeTCE').val("");
+             $('#inputProcessoTCE').val("");
+
+
+             if ($('#dropAutoridadeProlatora').val() == 9 ||
+                 $('#dropAutoridadeProlatora').val() == 10 ||
+                 $('#dropAutoridadeProlatora').val() == 12 ||
+                 $('#dropAutoridadeProlatora').val() == 13)
+             {
+                 $('#inputAnoParecer').val(new Date().getFullYear());
+             } else {
+                 $('#inputAnoParecer').val("");
+             }
+         });
+
+         $("#btnPesquisarInputMagistrado").click(function () {
+             var numeroVazio = (isNaN(parseInt($("#inputNumeroMagistrado").val().trim())) || parseInt($("#inputNumeroMagistrado").val().trim()) == 0);
+
+             if (numeroVazio && ($("#inputNomeMagistrado").val().trim() == "")) {
+                 $("#inputNumeroMagistrado").focus();
+                 return;
+             } else {
+                 if (numeroVazio && $("#inputNomeMagistrado").val().trim().length < 4) {
+                     $("#inputNomeMagistrado").focus();
+                     return;
+                 }
+             }
+
+             $("#secaoListarMagistrado").show();
+             $("#secaoBuscarMagistrado").hide();
+
+             $.ajax({
+                 url: '@Url.Action("CarregaComboMagistrado", "DocumentoDisponivel")',
+                 type: "GET",
+                 dataType: 'json',
+                 cache: false,
+                 async: false,
+                 "beforeSend": function () {
+                     $.blockUI({
+                         css: {
+                             border: 'none',
+                             padding: '15px',
+                             backgroundColor: '#000',
+                             '-webkit-border-radius': '10px',
+                             '-moz-border-radius': '10px',
+                             opacity: .5,
+                             color: '#fff'
+                         }
+                     });
+                 },
+                 data: {
+                     'pMatricula': $("#inputNumeroMagistrado").val().trim() == "" ? 0 : $("#inputNumeroMagistrado").val().trim(),
+                     'pNome': $("#inputNomeMagistrado").val().trim()
+                 },
+                 success: function (obj) {
+                     if (obj != null) {
+
+                         if (obj.data.length == 0) {
+                             CarregarOption($('#selectMagistrado'), '', 'Não encontrado...');
+                             setTimeout($.unblockUI, 1000);
+                             return;
+                         } else if (obj.data.length > 1) {
+                             CarregarOption($('#selectMagistrado'), '', 'Selecione...');
+                         } else {
+                             LimparOption($('#selectMagistrado'));
+                         }
+
+                         if ($("#inputNumeroMagistrado").val() != "") {
+                             if (obj.data[0].matricula != null) {
+                                 $('<option>').val(obj.data[0].matricula).text(obj.data[0].matricula + ' - ' + obj.data[0].Nome).appendTo($('#selectMagistrado'));
+                                 setTimeout($.unblockUI, 1000);
+                             }
+                         }
+                         else {
+                             $.each(obj.data, function (i, d) {
+                                 $('<option>').val(d.matricula).text(d.matricula + ' - ' + d.Nome).appendTo($('#selectMagistrado'));
+
+                             });
+                             setTimeout($.unblockUI, 1000);
+                         }
+
+                         if (obj.data.length == 1)
+                             $('#selectMagistrado').change();
+
+                         $('#selectMagistrado').focus();
+                     }
+                 }
+             });
+
+         });
+
+         $("#btnLimparInputMagistrado").click(function () {
+
+             LimparControleMagistrado();
+             $("#inputNumeroMagistrado").focus();
+         });
+
+        @*$.ajax({
+            url: '@Url.Action("AnalisarParecer", "DocumentoDisponivel")',
+            type: "GET",
+            dataType: 'json',
+            cache: false,
+            data: {
+                'pIdDocumento': $('#inputIdDocumento').val()
+            },
+            //success: function (results) {
+            //            if (results.data == true) {
+
+
+            //            }
+            //},
+            //error: function (response) {
+            //    var mensagem = new DOMParser().parseFromString(response.responseText, "text/html");
+            //    $('html, body').animate({ scrollTop: 0 }, 'slow');
+            //    exibeAlerta("erro", mensagem.title);
+            //}
+        });*@
+
+
+     });
+
+    function LimparControleMagistrado() {
+        $('#btnLimparInputMagistrado').prop('disabled', false);
+        $('#btnPesquisarInputMagistrado').prop('disabled', false);
+        $("#secaoBuscarMagistrado").show();
+        $("#secaoListarMagistrado").hide();
+        $('#selectMagistrado').val('').change();
+        $("#inputNomeMagistrado").val("").prop('disabled', false);
+        $("#inputNumeroMagistrado").val("").prop('disabled', false);
+    }
+
+
+    function CarregarOption($obj, val, text) {
+        LimparOption($obj);
+        $('<option>').val(val).text(text).appendTo($obj);
+        $obj.val(val);
+    }
+
+    function LimparOption($obj) {
+        $obj.find('option').remove();
+    }
+
+    function fnVoltar() {
+        window.history.go(-1);
+        return true;
+    }
+
+    function fnDispensar(idDocumento) {
+             fnLimparAlerta();
+             $.ajax({
+                    url: '@Url.Action("Dispensar", "DocumentoDisponivel")',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    async: true,
+                    beforeSend: function () {
+                        $.blockUI({
+                           message: '<img src="../Images/LogoPJERJ.png" /><br/> Em processamento...',
+                            css: {
+                                border: 'none',
+                                padding: '15px',
+                                backgroundColor: '#000',
+                                '-webkit-border-radius': '10px',
+                                '-moz-border-radius': '10px',
+                                opacity: .5,
+                                color: '#fff'
+                            }
+                        });
+                    },
+                    data: {
+                        'idDocumento': idDocumento
+                    },
+                    success: function (results) {
+                        if (results.data == true) {
+                            setTimeout($.unblockUI, 1000);
+                            fnApresentaMensagem("Dispensa de Documento", "Operação de Dispensa realizada com Sucesso.", 'success',"CON");
+                        } else {
+                            exibeAlerta("erro", results.msg);
+                            $('html, body').animate({ scrollTop: 0 }, 'slow');
+                            $('#btnSalvar').prop('disabled', false);
+                            setTimeout($.unblockUI, 1000);
+                        }
+                    },
+                    error: function (response) {
+                        var mensagem = new DOMParser().parseFromString(response.responseText, "text/html");
+                        exibeAlerta("erro", mensagem.title);
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                        $('#btnSalvar').prop('disabled', false);
+                        setTimeout($.unblockUI, 1000);
+                    }
+                });
+    }
+
+
+    function fnConfirmaAnalise(idDocumento) {
+             fnLimparAlerta();
+             $.ajax({
+                    url: '@Url.Action("ConfirmarAnalise", "DocumentoDisponivel")',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    async: true,
+                    beforeSend: function () {
+                        $.blockUI({
+                           message: '<img src="../Images/LogoPJERJ.png" /><br/> Em processamento...',
+                            css: {
+                                border: 'none',
+                                padding: '15px',
+                                backgroundColor: '#000',
+                                '-webkit-border-radius': '10px',
+                                '-moz-border-radius': '10px',
+                                opacity: .5,
+                                color: '#fff'
+                            }
+                        });
+                    },
+                    data: {
+                        'pIdDocumento': idDocumento,
+                        'pAutoridade': $('#dropAutoridadeProlatora').val(),
+                        'pMagistrado': $('#selectMagistrado').val(),
+                        'pDataDocumento': $('#inputDataParecer').val(),
+                        'pDataPublicacao': $('#inputDataPublicacao').val(),
+                        'pAutoridadeTCE': $('#inputAutoridadeTCE').val(),
+                        'pNProcessoTCE': $('#inputProcessoTCE').val(),
+                        'pExisteDecisaoOuParecer': $('#dropExisteDecisao').val(),
+                        'pSigiloso': $('#dropSigilo').val(),
+                        'pDisponivelWeb': $('#dropDisponibiliza').val(),
+                        'pAnoParecer': $('#inputAnoParecer').val()
+                    },
+                    success: function (results) {
+                        if (results.data == true) {
+                            setTimeout($.unblockUI, 1000);
+                            fnApresentaMensagem("Analise de Documento", "Operação de Análise realizada com Sucesso.", 'success','CON');
+                        } else {
+                            exibeAlerta("erro", results.msg);
+                            $('html, body').animate({ scrollTop: 0 }, 'slow');
+                            $('#btnDispensar').prop('disabled', false);
+                            setTimeout($.unblockUI, 1000);
+                        }
+                    },
+                    error: function (response) {
+                        var mensagem = new DOMParser().parseFromString(response.responseText, "text/html");
+                        exibeAlerta("erro", mensagem.title);
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                        $('#btnSalvar').prop('disabled', false);
+                        setTimeout($.unblockUI, 1000);
+                    }
+                });
+    }
+
+    function fnApresentaMensagem(titulo, texto, tipo, tipoMensagem) {
+
+        if (tipoMensagem == "CONFA") {
+             swal({
+                title: titulo,
+                text: texto,
+                type: tipo,
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'SIM',
+                cancelButtonText: 'NÃO'
+            }).then(
+                function (result) {
+                    if (result.value) {
+                        fnConfirmaAnalise(@Model.idDocumento);
+                    }
+                }
+            );
+        } else if (tipoMensagem == "CONFD") {
+            swal({
+                title: titulo,
+                text: texto,
+                type: tipo,
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'SIM',
+                cancelButtonText: 'NÃO'
+            }).then(
+                function (result) {
+                    if (result.value) {
+                            fnDispensar(@Model.idDocumento);
+                    }
+                }
+            );
+        } else {
+             swal({
+                title: titulo,
+                text: texto,
+                type: tipo,
+                showCancelButton: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Melhor eu parar...'
+            }).then(
+                function (result) {
+                    window.location.href = '@Url.Action("Consultar", "DocumentoDisponivel")';
+                }
+            );
+
+        }
+
+    }
+
+
+</script>
+<div class="col-lg-12">
+    <div class="dataTable_wrapper">
+        <div class="row">
+            <div id="divAlerta" class="col-lg-12">
+            </div>
+        </div>
+        <div class="row row-margin">
+            <div class="col-lg-6">
+                <label for="inputNumeroProcesso">Processo: @Model.numeroProcesso</label><br />
+                @{
+                    if (Model.parte == null)
+                    {
+                        <label for="inputParte">Parte: Não Informado</label><br />
+                    }
+                    else
+                    {
+                        foreach (var parte in Model.parte.ToList())
+                        {
+                            <label for="inputParte">Parte @parte.sequencia: @parte.nome</label><br />
+                        }
+                    }
+                }
+            </div>
+        </div>
+        <br />
+        <div class="row row-margin">
+            <div class="col-lg-3">
+                <label for="dropAutoridadeProlatora">Autoridade Prolatora:</label>
+                <select id="dropAutoridadeProlatora" name="dropAutoridadeProlatora" class="form-control">
+                </select>
+            </div>
+            <div class="col-lg-3">
+                <div id="secaoListarMagistrado" hidden="hidden">
+                    <label for="selectMagistrado" style="margin-left: 6px;">Magistrado:</label>
+                    <div class="col-lg-10" style="padding-left: 1px; padding-right: 1px;">
+                        <select id="selectMagistrado" name="selectMagistrado" class="form-control">
+                        </select>
+                    </div>
+                    <div class="col-lg-2" style="padding-left: 1px; padding-right: 1px;">
+                        <button id="btnLimparInputMagistrado" type="button" class="btn btn-default" style="width: 40px;"
+                                aria-label="Comarca. Limpar">
+                            <i class="fa fa-eraser"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="secaoBuscarMagistrado">
+                    <div style="padding-bottom: 5px;">Magistrado:</div>
+                    <div class="col-lg-3" style="padding-left: 1px; padding-right: 1px;">
+                        <input id="inputNumeroMagistrado" name="inputNumeroMagistrado" class="form-control"
+                               aria-label="Comarca. Pesquisar por Número">
+                    </div>
+                    <div class="col-lg-7" style="padding-left: 1px; padding-right: 1px;">
+                        <input id="inputNomeMagistrado" name="inputNomeMagistrado" class="form-control"
+                               aria-label="Comarca. Pesquisar por Nome de minímo de 4 caracteres" maxlength="50">
+                    </div>
+                    <div class="col-lg-2" style="padding-left: 1px; padding-right: 1px;">
+                        <button id="btnPesquisarInputMagistrado" type="button" class="btn btn-primary" style="width: 40px;"
+                                aria-label="Comarca. Pesquisar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <label for="inputAnoParecer">Ano do Parecer:</label>
+                <input id="inputAnoParecer" name="inputAnoParecer" class="form-control">
+            </div>
+            <div class="col-lg-2">
+                <label for="inputDataParecer">Data do Parecer:</label>
+                <input id="inputDataParecer" name="inputDataParecer" class="form-control" value="@Model.dataDocumento">
+            </div>
+            <div class="col-lg-2">
+                <label for="inputDataPublicacao">Data da Publicação:</label>
+                <input id="inputDataPublicacao" name="inputDataPublicacao" class="form-control" maxlength="10">
+            </div>
+        </div>
+        <br />
+        <div class="row row-margin">
+            <div class="col-lg-3">
+                <label for="inputAutoridadeTCE">Autoridade/Conselheiro TCE :</label>
+                <input id="inputAutoridadeTCE" name="inputAutoridadeTCE" class="form-control" maxlength="50">
+            </div>
+            <div class="col-lg-3">
+                <label for="inputProcessoTCE">N° Processo do TCE :</label>
+                <input id="inputProcessoTCE" name="inputProcessoTCE" class="form-control">
+            </div>
+            <div class="col-lg-2">
+                <label for="dropExisteDecisao">Existe Decisão ?</label>
+                <select id="dropExisteDecisao" name="dropExisteDecisao" class="form-control">
+                    <option value="">Selecione..</option>
+                    <option value="N">Não</option>
+                    <option value="S">Sim</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <label for="dropSigilo">Sigiloso :</label>
+                <select id="dropSigilo" name="dropSigilo" class="form-control">
+                    <option value="N" selected=@Model.sigilosoNao>Não</option>
+                    <option value="S" selected=@Model.sigilosoSim>Sim</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <label for="dropDisponibiliza">Disponibilizar na Web :</label>
+                <select id="dropDisponibiliza" name="dropDisponibiliza" class="form-control">
+                    <option value="">Selecione..</option>
+                    <option value="N">Não</option>
+                    <option value="S">Sim</option>
+                </select>
+            </div>
+        </div>
+        <br />
+        <div id="documento" class="div-overflow">
+            @{ WriteLiteral(Model.integraDocumento); }
+        </div>
+        <br />
+        <div class="row row-margin">
+            <div class="col-lg-12" style="text-align:right;">
+                <button id="btnDispensar" name="btnDispensar" type="button" class="btn btn-default" style="width:100px;" onclick="fnApresentaMensagem('Dispensar - Analise de Documento', 'Tem certeza que deseja dispensar o documento?', 'question','CONFD');"><i class="fa fa-eraser"></i>&nbsp;Dispensar</button>&nbsp;
+                <button id="btnVoltar" name="btnVoltar" type="button" class="btn btn-default" style="width:100px;" onclick="fnVoltar();"><i class="fa fa-backward"></i>&nbsp;Voltar</button>&nbsp;
+                <button id="btnSalvar" name="btnSalvar" type="button" class="btn btn-primary" style="width:100px;" onclick="fnApresentaMensagem('Salvar - Analise de Documento', 'Tem certeza que deseja confirmar a analise deste documento?', 'question','CONFA');"><i class="fa fa-save"></i>&nbsp;Salvar</button>&nbsp;
+            </div>
+        </div>        
+        <input id="inputIdDocumento" type="hidden" name="inputIdDocumento"  placeholder="" value="@Model.idDocumento" runat="server" />
+        <br />
+    </div>
+</div>
+
+

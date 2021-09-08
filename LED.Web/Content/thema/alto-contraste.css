@@ -1,0 +1,308 @@
+
+
+body, html{ background-color:#000;}
+
+.page-content{
+  background-color:#000 !important;
+  color:#FFF;
+}
+
+DIV.page-content {background-color:#000 !important;}
+
+
+a { color:#FF0;}
+
+a:hover { color:#FF0;}
+a:focus { color:#FF0;}
+
+
+
+.page-sidebar {
+background-color:#000 !important;
+}
+
+.page-sidebar-menu {
+background-color:#000 !important;
+}
+
+
+.page-content-wrapper{
+    background-color:#000 !important;
+}
+
+.page-sidebar-menu > li.active > a {
+    border: none;
+    text-shadow: none;
+    border-right: 4px solid #555;
+    border-right: 4px solid #ff0 !important;
+}
+
+ul.page-sidebar-menu > li > a.active {
+    color: #fff !important;
+    background-color: #888 !important;
+    border-right: 4px solid #555 !important;
+    border-right: 4px solid #ff0 !important;
+}
+
+
+ul.page-sidebar-menu > li > a{color:#FF0;}
+
+ul.page-sidebar-menu li > ul.sub-menu > li > a{ color:#FF0;}
+ul.page-sidebar-menu li > ul.sub-menu > li > a{ background-color:transparent !important;}
+ul.page-sidebar-menu li > ul.sub-menu > li > a:hover{ color:#FF0 !important;}
+ul.page-sidebar-menu li > ul.sub-menu > li > a:hover{ background-color:transparent !important;}
+ul.page-sidebar-menu li > ul.sub-menu > li > a:hover{ text-decoration:underline !important;}
+
+ul.page-sidebar-menu > li > a.active {background-color:transparent !important; color:#FF0 !important;}
+
+ul.page-sidebar-menu li > ul.sub-menu > li > a.active { background-color:transparent !important; text-decoration:underline !important; }
+ul.page-sidebar-menu > li.active > a{color:#FF0;}
+
+ul.page-sidebar-menu > li.active > a{ background-color:transparent !important; text-decoration:underline !important;}
+ul.page-sidebar-menu > li.open > a, ul.page-sidebar-menu > li > a:hover, ul.page-sidebar-menu > li:hover > a{ background-color:transparent !important;  text-decoration:underline !important}
+
+h1{color:#FF0 !important;}
+h2{color:#FF0 !important;}
+h3{color:#FF0 !important;}
+
+
+.breadcrumb { background-color:transparent; border:solid 1px #FF0;}
+
+.breadcrumb > li {
+    color: #FF0;
+}
+
+.breadcrumb > .active {
+    color: #FF0;
+}
+
+.navbar-static-top { background-color:#000;
+}
+
+.navbar {
+    background-color: #000;
+    border-bottom: 5px solid #000;);
+}
+
+.nav > li > a { color:#FF0;}
+.nav > li > a:hover { color:#FF0!important; text-decoration:underline !important;}
+.nav > li > a:focus { color:#FF0!important; text-decoration:underline !important;}
+
+.well {
+    border: 1px solid #FFF;
+	background-color:transparent;
+   
+}
+
+.panel-body { background-color:#000 !important; border:solid 1px #FFF;}
+.panel-default > .panel-heading { background-color:#000 !important; color:#FFF !important;}
+.panel-default > .panel-heading {
+    background-image: none;
+}
+
+.panel > .list-group .list-group-item { background-color:#000 !important;}
+
+.table-bordered{background-color:#000 !important;}
+.table{background-color:#000 !important;}
+.table-bordered > tbody > tr > td {background-color:#000 !important;}
+
+.table tbody tr:hover td { background-color:#000 !important;}
+
+.table-bordered > thead > tr > th {  background-image: none !important; background-color:#000 !important;}
+
+.table tbody tr th {  background-image: none !important; background-color:#000 !important;}
+.table tbody tr:hover th {  background-image: none !important; background-color:#000 !important;}
+
+pre { background-color:transparent; border:solid 1px #FFF; color:#FFF;}
+
+.table tbody tr td { background-color:#000 !important;}
+.table tbody tr:hover td { background-color:transparent;}
+
+.form-control { background-color:#000; color:#FFF}
+
+.show-grid [class^="col-"]{ background-color: #000 !important; color:#FFF }
+
+.btn {  background-color: #000 !important; color:#FFF; border:solid 1px #FF0;}
+.btn:hover {  background-color: #000 !important; color:#FFF; border:solid 1px #FF0;}
+
+.btn.btn-default { background:none; color:#FFF; border:solid 1px #FF0; box-shadow: none;}
+.btn.btn-default:hover { background:none; color:#FFF; border:solid 1px #FF0; box-shadow: none;}
+
+.btn.btn-primary { background:none; color:#FFF; border:solid 1px #FF0; box-shadow: none;}
+.btn.btn-primary:hover { background:none; color:#FFF; border:solid 1px #FF0; box-shadow: none;}
+
+a.btn.btn-default { color:#FFF !important;}
+
+.alert-success { background-color:#000; color:#FFF; border:solid 1px #FFF;}
+.alert-warning { background-color:#000; color:#FFF; border:solid 1px #FFF;}
+.alert-danger { background-color:#000; color:#FFF; border:solid 1px #FFF;}
+
+.modal-content { background-color:#000; color:#FFF; border:solid 1px #FFF;}
+.modal-content p { color:#FFF;}
+div.modal-header {
+    background-image: none !important;    
+}
+H4.modal-title{color: #FFF !important;}
+.close { color:#FFF; box-shadow:none; opacity: 1;}
+.close:hover { color:#FFF; box-shadow:none; opacity: 1;}
+label { color:#FFF;}
+
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a {background-color:#000 !important; color:#FFF !important;}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus {background-color:#000 !important; color:#FFF !important;}
+.nav-tabs > li > a:hover {background-color:#000 !important; color:#FFF;}
+
+nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    
+    background-color: #000 !important;
+	 color:#fff !important;
+	 }
+
+.pagination > li > a:focus, .pagination > li > a:hover, .pagination > li > span:focus, .pagination > li > span:hover {
+    color: #000;
+    background-color: none;
+    border-color: #000;
+}
+.pagination > li > a, .pagination > li > span {
+    
+    color: #FFF;
+    text-decoration: none;
+    background-color: #000;
+    border: 1px solid #FFF;
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    
+    color: #000;
+    cursor: default;
+    background-color: #ff0;
+    border-color: #fff;
+}
+
+.pagination > .disabled > a, .pagination > .disabled > a:focus, .pagination > .disabled > a:hover, .pagination > .disabled > span, .pagination > .disabled > span:focus, .pagination > .disabled > span:hover {
+    color: #fff !important;
+    cursor: not-allowed;
+    background-color: #000;
+}
+
+.list-group-item {
+    background-color: #000 !important;
+    border: 1px solid #fff !important;
+	
+}
+
+a.list-group-item{
+   color:#FFF !important;	
+}
+
+a.list-group-item:hover {
+    text-decoration: none;
+    background-color: #000 !important;
+}
+
+a.list-group-item.disabled{
+   color:#000 !important;	
+}
+
+.nav-pills > li > a:hover {
+    background-color: #000 !important;
+	border:solid 1px #ff0 !important;
+}
+
+.nav-pills > li.active > a {
+    background-color: #fff !important;
+	color:#000 !important;
+}
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color:#000 !important;
+    background-color:#fff !important;
+	border:none !important;
+}
+.nav > li > a:active {
+    color: #000 !important;
+    text-decoration: underline !important;
+}
+
+.modal-footer {
+    background-color:#000 !important;
+ 
+}
+
+div.tootip-inner{ color:#000;}
+
+.obg {
+    color: #ff0;
+}
+
+.dropdown-menu {
+   
+    background-color: #000;
+    border: 1px solid #fff;
+    box-shadow: none;
+}
+.navbar-top-links .dropdown-menu li a {
+    color: #ff0;
+}
+.navbar-top-links .dropdown-menu li a:hover {
+    background-color:#000 !important;
+	text-decoration:underline !important;
+	}
+	
+.fa-fw {
+    color:#FFF;
+}
+
+.fa-2x {
+    color:#FFF;
+}
+
+.box {
+    
+    background-color: #000;
+    border: 1px solid #ff0;
+    
+}
+
+.box .box-header, .box .box-footer {
+    background: none !important;
+	color:#fff !important;
+    border-bottom: 1px solid #ff0;
+	text-shadow: none;
+    
+}
+
+.input-group-addon {
+    color: #fff;
+    background-color: #000;
+   
+}
+
+.pickList .pickList_list {     
+    background-color: #000 !important;
+   
+}
+
+#logomarca-tribunal { background-image: url(../../images/logo-tj-small-alto-contraste.png); background-repeat:no-repeat;}
+
+#lista-acessibilidade a span {
+    background-color: #ff0!important;
+    color: #000!important;
+}
+
+.label-danger {
+    background-color: #000!important;
+	border: solid 1px #ff0;
+	color: #ff0!important;
+}
+
+.label-warning {
+    background-color: #000!important;
+	border: solid 1px #ff0;
+	color: #ff0!important;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: #000 !important;
+    background-color: #ff0 !important;
+    border: solid 1px #ff0 !important;
+}

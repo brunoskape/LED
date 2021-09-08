@@ -1,0 +1,281 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>@ViewBag.Title - LED</title>
+
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/aplication.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/slide-menu.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/timeline.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/led.css" />
+
+    <!-- Alto Contraste CSS -->
+    <link rel="alternate stylesheet" type="text/css" href="~/Content/thema/alto-contraste.css" title="alto-contraste" />
+
+    <script type="text/javascript" src="~/Scripts/modernizr-2.8.3.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.blockUI.js"></script>    
+    <script type="text/javascript" src="~/Scripts/inputmask/jquery.inputmask.js"></script>
+
+    <style>
+        body {
+            background-color: #FFF !important;
+        }
+
+        .dataTables_length, .dataTables_filter {
+            display: none;
+        }
+
+        .page-content {
+            background-color: #FFF !important;
+        }
+
+        .sub-menu {
+            min-height: inherit;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+
+</head>
+<body class="page-header-fixed page-sidebar-fixed">
+
+    <div id="wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="navbar-header">
+                    <a href="@Url.Action("Index", "Home")"><div id="logomarca-tribunal"><span id="descricao-logomarca-sistema">Logomarca do Poder Judiciário do Estado do Rio de Janeiro</span></div></a>
+                </div>
+            </div>
+            <ul id="lista-acessibilidade" style="margin-top:10px; margin-bottom:0; margin-right:15px;">
+                @if (System.Configuration.ConfigurationManager.AppSettings["AMBIENTE"] == "1")
+                {
+                    <li><span class="label label-danger" style="font-size:100%;">DESENVOLVIMENTO</span></li>
+                }
+                else if (System.Configuration.ConfigurationManager.AppSettings["AMBIENTE"] == "2")
+                {
+                    <li><span class="label label-warning" style="font-size:100%;">HOMOLOGAÇÃO</span></li>
+                }
+                <li><a accesskey="1" href="#iniciodomenu"><span>1</span>&nbsp;IR PARA O MENU</a></li>
+                <li><a accesskey="2" href="#iniciodoconteudo"><span>2</span>&nbsp;IR PARA O CONTEÚDO</a></li>
+                <li><a href="#" onclick="setActiveStyleSheet('alto-contraste'); return false; "><i class="fa fa-adjust"></i>&nbsp;ALTO CONTRASTE</a></li>
+                <li><a href="#" onclick="setActiveStyleSheet('default'); return false; "><i class="fa fa-circle-o"></i>&nbsp;CONTRASTE PADRÃO</a></li>
+                <li><a href="#" id="btnAumentar"><i class="fa fa-plus-square"></i>&nbsp;AUMENTAR FONTE</a></li>
+                <li><a href="#" id="btnDiminuir"><i class="fa fa-minus-square"></i>&nbsp;DIMINUIR FONTE</a></li>
+            </ul>
+
+            <!-- /.navbar-header -->
+            <ul class="nav nav2 navbar-top-links" style="margin-top:25px; text-align:right;">
+                <li class="dropdown">
+                    @{
+                        if (HttpContext.Current.Session["LEDWEB"] != null)
+                        {
+                            SegurancaWeb.ServicoCofre.EstUsuario ObjUsuLogado = new SegurancaWeb.ServicoCofre.EstUsuario();
+                            ObjUsuLogado = (SegurancaWeb.ServicoCofre.EstUsuario)HttpContext.Current.Session["LEDWEB"];
+                            string nome = ObjUsuLogado.nome;
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-user fa-1x icon-position"></i><span style="font-size:10px; text-transform:uppercase;">@nome</span> <i class="fa fa-caret-down"></i>
+                            </a>
+                        }
+                    }
+                    <ul class="dropdown-menu dropdown-user">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#sobreModal"><i class="fa fa-info-circle fa-fw"></i> Sobre o Sistema</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#" onclick="Logout()"><i class="fa fa-sign-out fa-fw"></i> Sair do Sistema</a>
+                        </li>
+                    </ul>
+
+                </li>
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="page-sidebar-wrapper">
+                <div class="page-sidebar navbar-collapse collapse" id="iniciodomenu">
+                    <a href="#iniciodomenu" id="iniciodomenu" accesskey="1" class="oculto">Início do menu</a>
+                    <!-- BEGIN SIDEBAR MENU -->
+                    <!-- DOC: for circle icon style menu apply page-sidebar-menu-circle-icons class right after sidebar-toggler-wrapper -->
+                    <ul class="page-sidebar-menu">
+                        <li class="sidebar-toggler-wrapper">
+                            <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+                            <div class="sidebar-toggler"></div>
+                            <div class="clearfix"></div>
+                            <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+                        </li>
+                        <li id="titulo-sistema">
+                            <a href="#">
+                                <span class="title">
+                                    <span>
+                                        <span>@System.Configuration.ConfigurationManager.AppSettings["siglaSistema"].ToString()</span>
+                                        <br />@System.Configuration.ConfigurationManager.AppSettings["descrSistema"].ToString()
+                                    </span>
+                                </span>
+                                <span class="selected"></span>
+                            </a>
+                        </li>
+
+                        @{
+                            if (HttpContext.Current.Session["LEDWEB"] != null)
+                            {
+                                SegurancaWeb.ServicoCofre.EstUsuario ObjUsuLogado = new SegurancaWeb.ServicoCofre.EstUsuario();
+                                ObjUsuLogado = (SegurancaWeb.ServicoCofre.EstUsuario)HttpContext.Current.Session["LEDWEB"];
+                                List<SegurancaWeb.ServicoCofre.EstAutorizacao> lstAutorizacao = ObjUsuLogado.autorizacoes.OfType<SegurancaWeb.ServicoCofre.EstAutorizacao>().ToList();
+
+                                // PÁGINA PRINCIPAL
+                                <li class="start ">
+                                    <a href="@Url.Action("Index", "Home")">
+                                        <i class="fa fa-home fa-fw"></i>
+                                        <span class="title">Página Principal</span>
+                                        <span class="selected"></span>
+                                    </a>
+                                </li>
+                                // Analisar Documentos
+                                <li>
+                                    <a href="javascript:;">
+                                        <i class="fa fa-edit fa-fw"></i>
+                                        <span class="title">Análise de Documentos</span>
+                                        <span class="arrow "></span>
+                                    </a>
+                                    <ul class="sub-menu">
+                                        @{
+                                            if (lstAutorizacao.Where(x => x.siglaFunc == "CDD" && x.indAutorizado == "S").Count() > 0)
+                                            {
+                                                <li>
+                                                    <a href="@Url.Action("Consultar", "DocumentoDisponivel")">Documentos Disponibilizados</a>
+                                                </li>
+                                            }
+
+                                        }
+                                    </ul>
+                                </li>
+                                //Portal
+                                <li>
+                                    <a href="javascript:;">
+                                        <i class="fa fa-edit fa-fw"></i>
+                                        <span class="title">Portal</span>
+                                        <span class="arrow "></span>
+                                    </a>
+                                    <ul class="sub-menu">
+                                        @{
+                                            if (lstAutorizacao.Where(x => x.siglaFunc == "CDD" && x.indAutorizado == "S").Count() > 0)
+                                            {
+                                                <li>
+                                                    <a href="@Url.Action("Consultar", "Portal")" target="_blank">Consultar Documentos</a>
+                                                </li>
+                                            }
+
+                                        }
+                                    </ul>
+                                </li>
+
+
+                            }
+                        }
+                        <!-- FIM MENU CONTROLE DE ACESSO -->
+                    </ul>
+
+                    <!-- END SIDEBAR MENU -->
+                </div>
+            </div>
+        </nav>
+        <!-- Modal SOBRE -->
+        <div class="modal fade" id="sobreModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="width:400px !important; margin-top: 180px; left:16%;">
+                    <div class="modal-header" style="background-color:#d9edf7;">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h5 class="modal-title">Sobre o Sistema</h5>
+                    </div>
+                    <div class="modal-body sobre-content" style="font-weight:normal;">
+                        <p>@System.Configuration.ConfigurationManager.AppSettings["descrSistema"].ToString()</p>
+                        <p>Versão: @System.Configuration.ConfigurationManager.AppSettings["versaoSistema"].ToString()</p>
+                        <p>Liberado em: @System.Configuration.ConfigurationManager.AppSettings["dataDeploy"].ToString()</p>
+                        <p>
+                            Poder Judiciário<br />
+                            Estado do Rio de Janeiro
+                        </p>
+                        <p>Todos direitos reservados ® 2020</p>
+                    </div><div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal SOBRE -->
+    </div>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <!-- DECLARAÇÃO DA ROTA -->
+                    <h3 class="page-header">
+                        @ViewBag.Title
+                    </h3>
+                    <ol class="breadcrumb">
+                        <li class="active">
+                            <i class="@ViewBag.IconRoute"></i> @ViewBag.DescrRoute
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <!-- /DIV -->
+            <!-- DIV DE CONTEÚDO -->
+            <div class="row" style="min-height:650px;" id="iniciodoconteudo">
+                @RenderBody()
+            </div>
+            <!-- /DIV -->
+
+        </div>
+        <!-- /#page-wrapper -->
+    </div>
+
+    <script type="text/javascript" src="~/Scripts/thema/aplication.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="~/Scripts/thema/jquery.slimscroll.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/Alertas/sweetalert2.all.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/Alertas/promise.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/thema/app.js"></script>
+    <script type="text/javascript" src="~/Scripts/thema/styleswitcher.js"></script>
+    <script type="text/javascript" src="~/Scripts/thema/font-size.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/led.js"></script>
+    <script type="text/javascript" src="~/Scripts/alerta.js"></script>
+    @RenderSection("imports", required: false)
+    <script>
+        jQuery(document).ready(function () {
+            App.init(); // initlayout and core plugins
+        });
+    </script>
+
+    <script>
+        // tooltip demo
+        $('.tooltip-demo').tooltip({
+            selector: "[data-toggle=tooltip]",
+            container: "body"
+        })
+    </script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

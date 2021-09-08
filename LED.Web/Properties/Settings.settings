@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="LED.Web.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="LED_Web_ServicoSeiDev_SeiService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://wwwh3.tjrj.jus.br/dev/sei/ws/SeiWS.php</Value>
+    </Setting>
+    <Setting Name="LED_Web_SeiServicoHML_SeiService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://wwwh3.tjrj.jus.br/sei/ws/SeiWS.php</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

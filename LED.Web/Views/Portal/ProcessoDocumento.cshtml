@@ -1,0 +1,310 @@
+﻿@model List<LED.Entities.DocumentoPortal>
+
+@{
+    ViewBag.Title = "Parecer e Decisão Administrativa";
+    Layout = "~/Views/Shared/_LayoutVisitante.cshtml";
+}
+
+<script type="text/javascript">
+
+     $(document).ready(function () {
+
+
+     });
+function fnNovaPesquisa()
+{
+    window.location.href = '@Url.Action("Consultar", "Portal")';
+}
+
+</script>
+<DIV id=content-barra>
+    &nbsp; <A href="javascript:self.print();">
+        <IMG title=imprimir class=margin-icos alt=imprimir src="http://www.tjrj.jus.br/imagens/ico-print.gif" width=26 height=17>
+    </A>&nbsp;
+</DIV>
+<div class="col-lg-12">
+    <div class="dataTable_wrapper">
+        <div class="row">
+            <div id="divAlerta" class="col-lg-12">
+            </div>
+        </div>
+        <br />
+        <div class="row row-margin">
+            <div class="col-lg-12">
+                <table cellSpacing=5 cellPadding=0 width="100%" border=0>
+                    <tbody>
+                        @{
+                            if (!String.IsNullOrEmpty(Model.FirstOrDefault().filtroNumeroProcesso))
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td><b>Protocolo pesquisado:</b></td>
+                                    <td colspan="2">@Model.FirstOrDefault().filtroNumeroProcesso</td>
+                                    <td></td>
+                                </tr>
+
+                            }
+
+                            if (!String.IsNullOrEmpty(Model.FirstOrDefault().filtroDataInicial))
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td><b>Perído selecionado:</b></td>
+                                    <td colspan="2">@String.Concat(Model.FirstOrDefault().filtroDataInicial, " a ", Model.FirstOrDefault().filtroFinal)</td>
+                                    <td></td>
+                                </tr>
+                            }
+
+                            if (!String.IsNullOrEmpty(Model.FirstOrDefault().filtroAssunto))
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td><b>Assunto pesquisado:</b></td>
+                                    <td colspan="2">@Model.FirstOrDefault().filtroAssunto</td>
+                                    <td></td>
+                                </tr>
+                            }
+
+                            if (!String.IsNullOrEmpty(Model.FirstOrDefault().filtroAutoridade))
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td><b>Autoridade pesquisada:</b></td>
+                                    <td colspan="2">@Model.FirstOrDefault().filtroAutoridade</td>
+                                    <td></td>
+                                </tr>
+                            }
+                            <tr>
+                                <td></td>
+                                <td><b>Resultado da Consulta:</b></td>
+                                <td>@String.Concat(Model.Select(x => x.numeroProcesso).Distinct().Count().ToString(), " Processo(s) Encontrado(s)")</td>
+                                <td></td>
+                                <td>
+                                    <button id="btnPesquisar" type="button" class="botao-pesquisar" onclick="fnNovaPesquisa();">
+                                        <i class="fa fa-search"></i>&nbsp;Nova Pesquisa
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="5"></th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                @foreach (var processo in Model.OrderByDescending(x => x.numeroProcesso).ToList())
+                {
+                    <hr />
+                    <table cellSpacing=5 cellPadding=0 width="100%" border=0>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td><b>Protocolo: </b></td>
+                                <td colspan="2">@Html.DisplayFor(modelItem => processo.numeroProcesso)</td>
+                                <td></td>
+                            </tr>
+                            @if (processo.listParte == null)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td><b>Parte:</b></td>
+                                    <td colspan="2">Não Informado</td>
+                                    <td></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var parte in processo.listParte)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><b>Parte: @Html.DisplayFor(modelItem => parte.sequencia)</b></td>
+                                        <td colspan="2">@Html.DisplayFor(modelItem => parte.nome)</td>
+                                        <td></td>
+                                    </tr>
+                                }
+                            }
+
+                            @foreach (var documento in processo.listDocumentosProcesso.OrderByDescending(X => Convert.ToDateTime(X.dataDocumento)))
+                            {
+                                if (documento.sigiloso)
+                                {
+                                    if (documento.tipoDocumento == "P")
+                                    {
+                                        <tr>
+                                            <td></td>
+                                            <td><b>Parecer :</b></td>
+                                            <td colspan="2">Sigiloso</td>
+                                            <td></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td></td>
+                                            <td><b>Decisão : </b></td>
+                                            <td colspan="2">Sigiloso</td>
+                                            <td></td>
+                                        </tr>
+                                    }
+
+                                }
+                                else if (documento.disponibilizarWeb)
+                                {
+                                    if (processo.eProcessoSEI)
+                                    {
+                                        if (documento.tipoDocumento == "P")
+                                        {
+                                            <tr>
+                                                <td></td>
+                                                <td><a href=@documento.linkDocumento target="_blank">Parecer</a></td>
+                                                <td colspan="2"></td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td></td>
+                                                <td><a href=@documento.linkDocumento target="_blank">Decisão</a></td>
+                                                <td colspan="2"></td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                        if (documento.tipoDocumento == "P")
+                                        {
+                                            <tr>
+                                                <td></td>
+                                                <td><a href="@Url.Action("Documento", "Portal",new { pProcesso = processo.numeroProcesso, pSequencial = documento.seqDocumento,pTipoDocumento = documento.tipoDocumento })" target="_blank">Parecer</a></td>
+                                                <td colspan="2"></td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td></td>
+                                                <td><a href="@Url.Action("Documento", "Portal",new { pProcesso = processo.numeroProcesso, pSequencial = documento.seqDocumento,pTipoDocumento = documento.tipoDocumento })" target="_blank">Decisão</a></td>
+                                                <td colspan="2"></td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (documento.tipoDocumento == "P")
+                                    {
+                                        <tr>
+                                            <td></td>
+                                            <td><b>Parecer :</b></td>
+                                            <td colspan="2">Não disponibilizado para internet.</td>
+                                            <td></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td></td>
+                                            <td><b>Decisão :</b></td>
+                                            <td colspan="2">Não disponibilizado para internet.</td>
+                                            <td></td>
+                                        </tr>
+                                    }
+
+                                }
+
+                                if (documento.tipoDocumento == "P")
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><b>Data do Paracer:</b></td>
+                                        <td colspan="2">@Html.DisplayFor(modelItem => documento.dataDocumento)</td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><b>Data da Decisão:</b></td>
+                                        <td colspan="2">@Html.DisplayFor(modelItem => documento.dataDocumento)</td>
+                                        <td></td>
+                                    </tr>
+                                }
+
+                                if (String.IsNullOrEmpty(documento.dataPublicacao))
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><b>Data da Publicação:</b></td>
+                                        <td colspan="2">Não Informada</td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><b>Data da Publicação:</b></td>
+                                        <td colspan="2">@Html.DisplayFor(modelItem => documento.dataPublicacao)</td>
+                                        <td></td>
+                                    </tr>
+                                }
+
+                                if (String.IsNullOrEmpty(documento.autoridadeProlatora))
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><b>Autoridade Prolatora :</b></td>
+                                        <td colspan="2">Não Informada</td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><b>Autoridade Prolatora:</b></td>
+                                        <td colspan="2">@Html.DisplayFor(modelItem => documento.autoridadeProlatora)</td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <th colspan="5"></th>
+                                </tr>
+                                if (documento.sigiloso == false && documento.disponibilizarWeb == true)
+                                {
+                                    if (documento.integra.Length <= 100)
+                                    {
+                                        <tr>
+                                            <td align="justify" colspan="5" rowspan="1"><p align=justify>@{WriteLiteral(documento.integra); }</p></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td align="justify" colspan="5" rowspan="1"><p align=justify>@{WriteLiteral(documento.integra.Substring(0, 100)); }</p></td>
+                                        </tr>
+                                    }
+
+                                }
+                                <tr>
+                                    <th colspan="5"></th>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

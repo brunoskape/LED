@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "Página Principal";
+    ViewBag.IconRoute = "fa fa-home fa-fw";
+    ViewBag.DescrRoute = "Página Principal";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/Scripts/alerta.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+       
+
+    });       
+</script>
+
+<div class="col-lg-12">
+    <a href="#iniciodoconteudo" id="iniciodoconteudo" accesskey="2" class="oculto">Início do conteúdo</a>
+    <div class="dataTable_wrapper">
+        <div class="well" style=" margin:0 auto; ">
+            <h1 style="margin-bottom:-10px; font-size:50px; font-weight:bold;">@System.Configuration.ConfigurationManager.AppSettings["siglaSistema"].ToString()</h1><br />
+            <span style="font-size:17px; line-height:25px;">
+                @System.Configuration.ConfigurationManager.AppSettings["descrSistema"].ToString()<br />
+            </span>
+            <br />
+            <p style="font-size:11px; text-align:right; margin-bottom:-10px;">Versão: @System.Configuration.ConfigurationManager.AppSettings["versaoSistema"].ToString()</p>
+        </div>
+
+    </div>
+</div>

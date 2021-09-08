@@ -1,0 +1,273 @@
+﻿@{
+    ViewBag.Title = "Documentos Disponibilizados";
+    ViewBag.IconRoute = "fa fa-edit fa-fw";
+    ViewBag.DescrRoute = "Analise de Documentos / Documento Disponivel / Consultar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section imports {
+    @{ var version = Guid.NewGuid().ToString(); }
+    <script type="text/javascript" src="~/Scripts/consulta-orgao-logado.js?v=@version"></script>
+    <script type="text/javascript" src="~/Scripts/util.js?v=@version"></script>
+}
+
+<script type="text/javascript">
+
+    var load = true;
+
+    $(document).ready(function () {
+
+        $("#inputDataInicio").inputmask("99/99/9999");
+        $("#inputDataFim").inputmask("99/99/9999");
+        $("#inputNumeroProcesso").inputmask("9999-9999999");
+
+        //Carrega dados da grid
+        var oTable = $("#tableDocumento").DataTable({
+            "language": {
+                "processing": "",
+                "paginate": { "previous": "Retornar", "next": "Avançar" },
+                "zeroRecords": "Nada foi encontrado",
+                "info": "Exibindo de _START_ à _END_ de _TOTAL_ registros",
+                "infoEmpty": "Sem registros",
+                "infoFiltered": "(filtrado de _MAX_ regitros totais)"
+            },
+            "processing": true, // mostrar a progress bar
+            "pageLength": 10,
+            "ajax": {
+                "url": "@Url.Action("Listar", "DocumentoDisponivel")",
+                "type": "GET",
+                "dataType": "json",
+                "cache": "false",
+                "async": "false",
+                "beforeSend": function () {
+                    $.blockUI({
+                       message: '<img src="../Images/LogoPJERJ.png" /><br/> Em processamento...',
+                        css: {                            
+                            border: 'none',
+                            padding: '15px',
+                            backgroundColor: '#000',
+                            '-webkit-border-radius': '10px',
+                            '-moz-border-radius': '10px',
+                            opacity: .5,
+                            color: '#fff'
+                        }
+                    });
+                },
+                "data": function (d){
+                    d.NumeroProcesso = $("#inputNumeroProcesso").val(),
+                    d.DataInicial = $("#inputDataInicio").val(),
+                    d.DataFinal = $("#inputDataFim").val(),
+                    d.TipoDocumento = $("#dropTipoDocumento").val(),
+                    d.Load = load
+                },
+                "error": function (response) {
+                    if (load == false) {
+                        var mensagem = new DOMParser().parseFromString(response.responseText, "text/html");
+                        exibeAlerta("erro", mensagem.title);
+                        fnFimCarregamentoGrid();
+                    } else {
+                        load = false;
+                    }
+                    setTimeout($.unblockUI, 1000);
+                },
+
+            },
+            "columns": [
+                {
+                    "data": "numeroProcesso", "title": "Nº do Processo", "autowidth": true
+                },
+                {
+                    "data": "nomeTipoDocumento", "title": "Tipo de Documento", "autowidth": true
+                },
+                {
+                    "data": "dataDocumento", "title": "Data do Documento", "autowidth": true
+                },
+                {
+                    "data": "descricaoOrgaoGerador", "title": "Orgão Gerador", "autowidth": true
+                },
+                {
+                 "render": function (data, type, row) {
+                        return '<div class"center" align="center"> ' +
+                            ' <div class="btn-group"> ' +
+                            '   <button type="button" id="btnGridAnalisar" class="btn btn-default" style="padding:1px 10px;">' +
+                            '     <i class= "fa fa-edit" ></i>&nbsp; Analisar ' +
+                            '   </button>' +
+                            ' </div>' +
+                            '</div>';
+                    },
+                    "title": "Ações",
+                    "autowidth": true
+                }
+            ]
+        });
+
+        //Atribui cor diferente as linhas ímpares da grid
+        oTable.$('tr:odd').css('backgroundColor', '#eee');
+
+        oTable.on('draw', function () {
+            setTimeout($.unblockUI, 3000);
+            fnFimCarregamentoGrid();
+        });
+
+        oTable.on('preDraw', function () {
+            fnLimparAlerta();
+        });
+
+
+        //Atribui função ao click do botão Editar da grid
+        $('#tableDocumento tbody').on('click', '#btnGridAnalisar', function () {
+            fnLimparAlerta();
+            var data = oTable.row($(this).parents('tr')).data();
+
+             $.ajax({
+                    url: '@Url.Action("CarregaDadosEntrada", "DocumentoDisponivel")',
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+                    async: true,
+                    beforeSend: function () {
+                        $.blockUI({
+                            css: {
+                                border: 'none',
+                                padding: '15px',
+                                backgroundColor: '#000',
+                                '-webkit-border-radius': '10px',
+                                '-moz-border-radius': '10px',
+                                opacity: .5,
+                                color: '#fff'
+                            }
+                        });
+                    },
+                    data: {
+                        'numeroProcesso': data["numeroProcesso"],
+                        'nomeTipoDocumento': data["nomeTipoDocumento"],
+                        'dataDocumento': data["dataDocumento"]
+                    },
+                 success: function (results) {
+                        if (results.data == false) {
+                             exibeAlerta("erro", results.msg);
+                             fnFimCarregamentoGrid();
+                             setTimeout($.unblockUI, 1000);
+                        } else {
+                            if (results.tipoDocumento == "P") {
+                                window.location.href = '@Url.Action("AnalisarParecer", "DocumentoDisponivel")';
+                                setTimeout($.unblockUI, 3000);
+                            } else if (results.tipoDocumento == "D") {
+                                window.location.href = '@Url.Action("AnalisarDecisao", "DocumentoDisponivel")';
+                                setTimeout($.unblockUI, 3000);
+                            } else {
+                                exibeAlerta("erro", "Esse documento não é uma Decisão ou Parecer. Por favor entrar em contato com o suporte do sistema.");
+                                fnFimCarregamentoGrid();
+                                setTimeout($.unblockUI, 1000);
+                            }
+
+                         }
+
+                    },
+                 error: function (response) {
+                        var mensagem = new DOMParser().parseFromString(response.responseText, "text/html");
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                        exibeAlerta("erro", mensagem.title);
+                        setTimeout($.unblockUI, 1000);
+                    }
+                });            
+        });
+
+
+        //Valida se retornou da tela de cadastro e exibe mensagem
+        if (sessionStorage.getItem("Alerta") == "Cadastrado") {
+            exibeAlerta("sucesso", "Cadastrado com sucesso.");
+        } else if (sessionStorage.getItem("Alerta") == "Alterado") {
+            exibeAlerta("sucesso", "Alterado com sucesso.");
+        }
+        sessionStorage.setItem("Alerta", "");
+    });
+
+
+    //Limpa todos os campos e botões retornando para estado inicial
+    function fnLimpar() {
+        fnLimparAlerta();
+        load = true;
+        $("#inputNumeroProcesso").val("");
+        $("#inputDataInicio").val("");
+        $("#inputDataFim").val("");
+        $("#dropTipoDocumento").val("");
+        $('#tableDocumento').DataTable().clear().draw();
+        setTimeout($.unblockUI, 1000);
+    }
+
+    function fnBuscar() {
+        fnLimparAlerta();
+        load = false;
+        $('#tableDocumento').DataTable().ajax.reload();
+    }
+
+
+    function fnFimCarregamentoGrid() {
+
+        $("#btnLimpar").prop('disabled', false);
+        $("#btnBuscar").prop('disabled', false);
+
+        if ($('#tableDocumento').DataTable().page.info().recordsTotal == 400)
+            exibeAlerta("erro", 'Não foi possível carregar todos os documentos, o resultado ultrapassou o limite de 400 linhas, por favor utilize parâmetros mais restritivos.');
+
+    }
+
+
+</script>
+
+<div class="col-lg-12">
+    <div class="dataTable_wrapper">
+        <div class="row">            
+            <div id="divAlerta" class="col-lg-12">
+            </div>
+        </div>
+        <div class="row row-margin">
+            <div class="col-lg-4">
+                <label for="inputNumeroProcesso">Nº do Processo:</label>
+                <input id="inputNumeroProcesso" name="inputNumeroProcesso" class="form-control" placeholder="" maxlength="60">
+            </div>
+            <div class="col-lg-4">
+                <label for="inputDataInicio">Data Inicial:</label>
+                <input id="inputDataInicio" name="inputDataInicio" class="form-control" maxlength="10">
+            </div>
+            <div class="col-lg-4">
+                <label for="inputDataFim">Data Final:</label>
+                <input id="inputDataFim" name="inputDataFim" class="form-control" maxlength="10">
+            </div>
+            <div class="col-lg-4">
+                <label for="dropTipoDocumento">Tipo de Documento:</label>
+                <select id="dropTipoDocumento" name="dropTipoDocumento" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="D">Decisão</option>
+                    <option value="P">Parecer</option>
+                </select>
+            </div>
+        </div>
+        <br />
+        <div class="row row-margin">
+            <div class="col-lg-12" style="text-align:right;">
+                <button id="btnLimpar" name="btnLimpar" type="button" class="btn btn-default" style="width:100px;" onclick="fnLimpar(); fnLimparAlerta();"><i class="fa fa-eraser"></i>&nbsp;Limpar</button>&nbsp;
+                <button id="btnBuscar" name="btnBuscar" type="button" class="btn btn-primary" style="width:100px;" onclick="fnBuscar()"><i class="fa fa-search"></i>&nbsp;Buscar</button>&nbsp;
+            </div>
+        </div>
+        <br />
+        <div class="row row-margin">
+            <div class="col-lg-12">
+                <table class="table table-striped table-bordered table-hover" id="tableDocumento">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th width="15%"></th>
+                            <th width="10%"></th>
+                            <th width="35%"></th>
+                            <th width="25%"></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>   
+</div>
+
+

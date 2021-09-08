@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>@ViewBag.Title - LEDWEB</title>
+
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/aplication.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/slide-menu.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/timeline.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/thema/led.css" />
+
+    <!-- Alto Contraste CSS -->
+    <link rel="alternate stylesheet" type="text/css" href="~/Content/thema/alto-contraste.css" title="alto-contraste" />
+
+    <!-- Portal CSS -->
+    <link rel="stylesheet" type="text/css" href="https://www.tjrj.jus.br/theme-tjrj/css/sistemas/custom_sistemas_form.css" />
+    <link rel="stylesheet" type="text/css" href="https://www.tjrj.jus.br/theme-tjrj/css/sistemas/custom_sistemas_textos_img.css" />
+    <link rel="stylesheet" type="text/css" href="https://www.tjrj.jus.br/theme-tjrj/css/importacao-sistemas.css" />
+
+    <script type="text/javascript" src="~/Scripts/modernizr-2.8.3.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="~/Scripts/inputmask/jquery.inputmask.js"></script>
+
+    <style>
+        body {
+            background-color: #FFF !important;
+        }
+
+        .dataTables_length, .dataTables_filter {
+            display: none;
+        }
+
+        .page-content {
+            background-color: #FFF !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="tudo">
+        @Html.Raw(PortalService.DotNetImport("http://www.tjrj.jus.br/importacao-portal/tpl/topo"))
+        @Html.Raw(PortalService.DotNetImport("http://www.tjrj.jus.br/importacao-portal/tpl/menu-horizontal"))
+        <div id="container" style="margin-top:40px;">
+            @* Pegar o menu do lado que tem no LED *@
+            @Html.Raw(PortalService.DotNetImport("https://www.tjrj.jus.br/web/guest/home/-/menu-vertical/montar?menuId=/consultas"))
+            <div id="content">
+                <div id="conteudo">
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h3 class="page-header">
+                                @ViewBag.Title
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="row" id="iniciodoconteudo">
+                        @RenderBody()
+                    </div>
+
+                    <script type="text/javascript" src="~/Scripts/thema/aplication.js"></script>
+                    <script type="text/javascript" src="~/Scripts/jquery.dataTables.js"></script>
+                    <script type="text/javascript" src="~/Scripts/thema/jquery.slimscroll.min.js"></script>
+                    <script type="text/javascript" src="~/Scripts/thema/app.js"></script>
+                    <script type="text/javascript" src="~/Scripts/thema/styleswitcher.js"></script>
+                    <script type="text/javascript" src="~/Scripts/thema/font-size.js"></script>
+                    <script type="text/javascript" src="~/Scripts/led.js"></script>
+                    <script type="text/javascript" src="~/Scripts/alerta.js"></script>
+                    @RenderSection("imports", required: false)
+
+                    <script>
+                        jQuery(document).ready(function () {
+                            App.init(); // initlayout and core plugins
+                        });
+                    </script>
+
+                    <script>
+                        // tooltip demo
+                        $('.tooltip-demo').tooltip({
+                            selector: "[data-toggle=tooltip]",
+                            container: "body"
+                        })
+                    </script>
+
+                    @RenderSection("scripts", required: false)
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+        @Html.Raw(PortalService.DotNetImport("http://www.tjrj.jus.br/importacao-portal/tpl/rodape"))
+    </div>
+</body>
+</html>

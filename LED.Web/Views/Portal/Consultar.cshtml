@@ -1,0 +1,193 @@
+﻿@{
+    ViewBag.Title = "Consultar Parecer / Decisão Administrativa";
+    Layout = "~/Views/Shared/_LayoutVisitante.cshtml";
+}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#inputNumeroProcesso").inputmask("9999-9999999");
+        $("#inputDataInicio").inputmask("99/99/9999");
+        $("#inputDataFim").inputmask("99/99/9999");
+
+         $.ajax({
+            url: '@Url.Action("CarregaComboAutoridadeProla", "DocumentoDisponivel")',
+            type: "GET",
+            dataType: 'json',
+            cache: false,
+            data: {
+                'pCarregaDecisao': false
+            },
+            success: function (obj) {
+                if (obj != null) {
+                    var data = obj.data;
+                    var selectbox = $('#dropAutoridadeProlatora');
+                    selectbox.find('option').remove();
+                    $('<option>').val("").text("Selecionar a Autoridade").appendTo(selectbox);
+                    $.each(data, function (i, d) {
+                        $('<option>').val(d.codAutoridade).text(d.responsavel).appendTo(selectbox);
+                    });
+                }
+            }
+        });
+
+        $('#PorAssunto-tab').on('click', function (event) {
+            event.preventDefault();
+            fnLimpar();
+            $(this).removeClass("nav-link").addClass("active nav-link");
+            $('#PorAssunto').removeClass("tab-pane").addClass("tab-pane active");
+            $('#PorNumero-tab').removeClass("active nav-link").addClass("nav-link");
+            $('#PorNumero').removeClass("tab-pane active").addClass("tab-pane");
+
+        });
+
+        $('#PorNumero-tab').on('click', function (event) {
+
+
+            event.preventDefault();
+            fnLimpar();
+            $(this).removeClass("nav-link").addClass("active nav-link");
+            $('#PorNumero').removeClass("tab-pane").addClass("tab-pane active");
+            $('#PorAssunto-tab').removeClass("active nav-link").addClass("nav-link");
+            $('#PorAssunto').removeClass("tab-pane active").addClass("tab-pane");
+        });
+
+    });
+
+  function fnLimpar() {
+        fnLimparAlerta();
+        $("#inputNumeroProcesso").val("");
+        $("#inputDataInicio").val("");
+        $("#inputDataFim").val("");
+        $("#inputAssunto").val("");
+        $('#dropAutoridadeProlatora').val("");
+    }
+
+    function fnPesquisar() {
+       fnLimparAlerta();
+       $.ajax({
+                   url: '@Url.Action("CarregaDadosEntrada", "Portal")',
+                   type: 'GET',
+                   dataType: 'json',
+                   cache: false,
+                   async: true,
+                   beforeSend: function () {
+                       $.blockUI({
+                           message: '<img src="../Images/LogoPJERJ.png" /><br/> Em processamento...',
+                           css: {
+                               border: 'none',
+                               padding: '15px',
+                               backgroundColor: '#000',
+                               '-webkit-border-radius': '10px',
+                               '-moz-border-radius': '10px',
+                               opacity: .5,
+                               color: '#fff'
+                           }
+                       });
+                   },
+                   data: {
+                       'pNumeroProcesso': $("#inputNumeroProcesso").val(),
+                       'pDataInicio': $("#inputDataInicio").val(),
+                       'pDataFim': $("#inputDataFim").val(),
+                       'pAssunto': $("#inputAssunto").val(),
+                       'pAutoridadeProlatora': $('#dropAutoridadeProlatora').val()
+                   },
+                   success: function (results) {
+                        if (results.data == false) {
+                            exibeAlerta("erro", results.msg);
+                        } else {
+                            window.location.href = '@Url.Action("ProcessoDocumento", "Portal")';                            
+                        }
+                       setTimeout($.unblockUI, 1000);
+
+                   },
+                   error: function (response) {
+                        var mensagem = new DOMParser().parseFromString(response.responseText, "text/html");
+                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                        exibeAlerta("erro", mensagem.title);
+                        setTimeout($.unblockUI, 1000);
+                   }
+       });
+    }
+</script>
+
+<div class="col-lg-12">
+    <a href="#iniciodoconteudo" id="iniciodoconteudo" accesskey="2" class="oculto">Início do conteúdo</a>
+    <div class="dataTable_wrapper">
+        <div class="row">
+            <div id="divAlerta" class="col-lg-12">
+            </div>
+        </div>
+        <div class="row row-margin">
+            <div class="col-lg-12">
+                <div class="box-conteudo">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active"
+                               id="PorAssunto-tab"
+                               data-mdb-toggle="tab"
+                               href="#PorAssunto"
+                               role="tab"
+                               aria-controls="home"
+                               aria-selected="true">Por Assunto</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link"
+                               id="PorNumero-tab"
+                               data-mdb-toggle="tab"
+                               href="#PorNumero"
+                               role="tab"
+                               aria-controls="profile"
+                               aria-selected="false">Por Número</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="PorAssunto" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="row row-margin">
+                                <div class="col-lg-3">
+                                    <label for="inputDataInicio">Inicio:</label>
+                                    <input id="inputDataInicio" name="inputDataInicio" class="form-control" maxlength="10">
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="inputDataFim">Fim:</label>
+                                    <input id="inputDataFim" name="inputDataFim" class="form-control" maxlength="10">
+                                </div>
+                            </div>
+                            </br>
+                            <div class="row row-margin">
+                                <div class="col-lg-6">
+                                    <label for="inputAssunto">Assunto :</label>
+                                    <input id="inputAssunto" name="inputAssunto" class="form-control" maxlength="50">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="dropAutoridadeProlatora">Autoridade Prolatora:</label>
+                                    <select id="dropAutoridadeProlatora" name="dropAutoridadeProlatora" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="PorNumero" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="row row-margin">
+                                <div class="col-lg-4">
+                                    <label for="inputNumeroProcesso">Nº do Processo:</label>
+                                    <input id="inputNumeroProcesso" name="inputNumeroProcesso" class="form-control" placeholder="" maxlength="12">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row row-margin">
+            <div class="col-lg-12" style="text-align:right;">
+                <button id="btnBuscar" name="btnBuscar" type="button" class="botao-pesquisar"  onclick="fnPesquisar()"><i class="fa fa-search"></i>&nbsp;Pesquisar</button>&nbsp;
+                <button id="btnLimpar" name="btnLimpar" type="button" class="botao-limpar"  onclick="fnLimpar(); fnLimparAlerta();"><i class="fa fa-eraser"></i>&nbsp;Limpar</button>&nbsp;
+            </div>
+        </div>
+    </div>
+</div>
+
+
